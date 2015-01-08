@@ -1,0 +1,16 @@
+/* Space out content a bit */
+body {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+.fullWindowZone{
+	width: 600px;
+	height: 600px;
+	background-color: #AFAFAF;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	
+}
+
+/* Everything but the jumbotron gets side spac */
