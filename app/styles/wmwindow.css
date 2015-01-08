@@ -401,3 +401,11 @@
     -ms-user-select: text;
     -o-user-select: text;
 }
+
+.wmWindow.resizing .wmWindowBox, .wmWindow.moving .wmWindowBox{
+	background-color: #4c4c4c;
+}
+
+.wmWindow.resizing .wmWindowBox div.wmTitleBar, .wmWindow.moving .wmWindowBox div.wmTitleBar{
+	background-color: #c13e10;
+}

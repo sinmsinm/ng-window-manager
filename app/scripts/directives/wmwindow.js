@@ -20,26 +20,45 @@ angular.module('ngWindowManager',[])
 		link: function (scope, element) {
 			var windowArea = element[0].parentElement;
 			var titleBarElement = element[0].children[0].children[0];
+			//var contentButtonElement = element[0].children[0].children[1];
+			var resizeButtonElement = element[0].children[0].children[2];
 
 			var moveState = null;
+			var sizeState = null;
+
 			var startMoving = function (e){
 
-
-				moveState = toLocal({
+				moveState = calculatePos({
 					x: e.pageX,
 					y: e.pageY
 				});
 
+				element.addClass('moving');
 
-				element.addClass('move');
-
+				removeWindowAreaListeners();
 				windowArea.addEventListener ('mousemove',dragWindow);
 				windowArea.addEventListener ('mouseup',dragWindowEnds);
 
 				e.preventDefault();
-
 			};
 
+
+			var startResizing = function (e){
+
+				sizeState = calculateSize ({
+					width:  e.pageX,
+					height: e.pageY
+				});
+
+				element.addClass('resizing');
+
+				removeWindowAreaListeners();
+				windowArea.addEventListener ('mousemove',dragWindowCorner);
+				windowArea.addEventListener ('mouseup',dragWindowCornerEnds);
+
+				e.preventDefault();
+
+			};
 
 			var dragWindow = function(e) {  
 
@@ -51,37 +70,74 @@ angular.module('ngWindowManager',[])
 				}
 			};
 
+			var dragWindowCorner = function (e){
+				if (sizeState){
+					resize (
+						e.pageX + sizeState.width,
+						e.pageY + sizeState.height
+					);	
+				}
+			};
+
 			var dragWindowEnds = function (){
 				if (moveState) {
-					element.removeClass('move');
+					element.removeClass('moving');
 					moveState = null;
 				}
 
-				windowArea.removeEventListener ('mousemove');
-				windowArea.removeEventListener ('mouseup');
-
+				removeWindowAreaListeners();
 			};
 
+			var dragWindowCornerEnds = function (){
+				if (sizeState){
+					element.removeClass ('resizing');
+					sizeState = null;
+				}
 
-			var toLocal = function(coord) {
+				removeWindowAreaListeners();
+			};
+
+			var removeWindowAreaListeners = function (){
+				windowArea.removeEventListener ('mousemove');
+				windowArea.removeEventListener ('mouseup');
+			};
+
+			var calculatePos = function(ref) {
 				var winX = parseInt(element.prop('offsetLeft'), 10);
 				var winY = parseInt(element.prop('offsetTop'), 10); 	
 
 				return {
-					x: coord.x - winX,
-					y: coord.y - winY
+					x: ref.x - winX,
+					y: ref.y - winY
 				};
 			};
 
+			var calculateSize = function (ref){
+				var winWidth = parseInt(element.prop('offsetWidth'), 10);
+				var winHeight = parseInt(element.prop('offsetHeight'), 10);
+
+				return {
+					width: winWidth - ref.width,
+					height: winHeight - ref.height
+				};
+			};
+
+			//set the element in the specified position
 			var move = function(x, y) {
 				element.css('left',x +'px');
 				element.css('top',y + 'px');
 
 			};
 
+			//set the new size of the element
+			var resize = function (width,height) {
+				element.css ('width', width + 'px');
+				element.css ('height', height + 'px');
+			};
 
-			//Click the title bar
+			//Set the listeners to the elements
 			titleBarElement.addEventListener ('mousedown', startMoving);
+			resizeButtonElement.addEventListener ('mousedown',startResizing);
 
 		}
 	};
