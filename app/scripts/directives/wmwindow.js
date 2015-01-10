@@ -41,6 +41,8 @@ angular.module('ngWindowManager',[])
 				windowArea.addEventListener (isTouch ? 'touchmove' : 'mousemove',dragWindow);
 				windowArea.addEventListener (isTouch ? 'touchend' : 'mouseup',dragWindowEnds);
 
+				selectWindow();
+				
 				e.preventDefault();
 			};
 
@@ -60,6 +62,8 @@ angular.module('ngWindowManager',[])
 				windowArea.addEventListener (isTouch ? 'touchmove' : 'mousemove',dragWindowCorner);
 				windowArea.addEventListener (isTouch ? 'touchend' : 'mouseup', dragWindowCornerEnds);
 
+				selectWindow();
+				
 				e.preventDefault();
 
 			};
@@ -146,7 +150,7 @@ angular.module('ngWindowManager',[])
 			};
 
 			var selectWindow = function (){
-				console.log ('window');
+				windowArea.appendChild (element[0]);
 			};
 			
 			//Set the listeners to the elements
@@ -155,8 +159,6 @@ angular.module('ngWindowManager',[])
 			resizeButtonElement.addEventListener ('mousedown',startResizing);
 			resizeButtonElement.addEventListener ('touchstart',startResizing);
 			
-			
-			titleBarElement.addEventListener ('click', selectWindow);
 			contentButtonElement.addEventListener ('click', selectWindow);
 			
 		}
