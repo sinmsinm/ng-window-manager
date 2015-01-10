@@ -20,88 +20,98 @@ angular.module('ngWindowManager',[])
 		link: function (scope, element) {
 			var windowArea = element[0].parentElement;
 			var titleBarElement = element[0].children[0].children[0];
-			//var contentButtonElement = element[0].children[0].children[1];
+			var contentButtonElement = element[0].children[0].children[1];
 			var resizeButtonElement = element[0].children[0].children[2];
+			
 
 			var moveState = null;
 			var sizeState = null;
 
 			var startMoving = function (e){
-
+				var isTouch = (e.targetTouches && e.targetTouches.length == 1);
+				var moveRef =  isTouch ?  e.targetTouches[0] : e;
+				
 				moveState = calculatePos({
-					x: e.pageX,
-					y: e.pageY
+					x: moveRef.pageX,
+					y: moveRef.pageY
 				});
 
 				element.addClass('moving');
 
-				removeWindowAreaListeners();
-				windowArea.addEventListener ('mousemove',dragWindow);
-				windowArea.addEventListener ('mouseup',dragWindowEnds);
+				windowArea.addEventListener (isTouch ? 'touchmove' : 'mousemove',dragWindow);
+				windowArea.addEventListener (isTouch ? 'touchend' : 'mouseup',dragWindowEnds);
 
 				e.preventDefault();
 			};
 
 
 			var startResizing = function (e){
-
+				var isTouch = (e.targetTouches && e.targetTouches.length == 1);
+				var moveRef =  isTouch ?  e.targetTouches[0] : e;
+				
+				
 				sizeState = calculateSize ({
-					width:  e.pageX,
-					height: e.pageY
+					width:  moveRef.pageX,
+					height: moveRef.pageY
 				});
 
 				element.addClass('resizing');
 
-				removeWindowAreaListeners();
-				windowArea.addEventListener ('mousemove',dragWindowCorner);
-				windowArea.addEventListener ('mouseup',dragWindowCornerEnds);
+				windowArea.addEventListener (isTouch ? 'touchmove' : 'mousemove',dragWindowCorner);
+				windowArea.addEventListener (isTouch ? 'touchend' : 'mouseup', dragWindowCornerEnds);
 
 				e.preventDefault();
 
 			};
 
 			var dragWindow = function(e) {  
-
+				var moveRef = (e.targetTouches && e.targetTouches.length == 1) ?  e.targetTouches[0] : e;
+				
 				if (moveState){
 					move(
-						e.pageX - moveState.x,
-						e.pageY - moveState.y
+						moveRef.pageX - moveState.x,
+						moveRef.pageY - moveState.y
 					);
 				}
 			};
 
 			var dragWindowCorner = function (e){
+				var moveRef = (e.targetTouches && e.targetTouches.length == 1) ?  e.targetTouches[0] : e;
+
 				if (sizeState){
 					resize (
-						e.pageX + sizeState.width,
-						e.pageY + sizeState.height
+						moveRef.pageX + sizeState.width,
+						moveRef.pageY + sizeState.height
 					);	
 				}
 			};
 
-			var dragWindowEnds = function (){
+			var dragWindowEnds = function (e){
+				var isTouch = (e.targetTouches && e.targetTouches.length == 1);
+				
 				if (moveState) {
 					element.removeClass('moving');
 					moveState = null;
 				}
 
-				removeWindowAreaListeners();
+				windowArea.removeEventListener (isTouch ? 'touchmove' : 'mousemove',dragWindow);
+				windowArea.removeEventListener (isTouch ? 'touchend' : 'mouseup',dragWindowEnds);
+				titleBarElement.removeEventListener ('click', selectWindow);
 			};
 
-			var dragWindowCornerEnds = function (){
+			var dragWindowCornerEnds = function (e){
+				var isTouch = (e.targetTouches && e.targetTouches.length == 1);
+				
 				if (sizeState){
 					element.removeClass ('resizing');
 					sizeState = null;
 				}
-
-				removeWindowAreaListeners();
+				
+				windowArea.removeEventListener (isTouch ? 'touchmove' : 'mousemove',dragWindowCorner);
+				windowArea.removeEventListener (isTouch ? 'touchend' : 'mouseup',dragWindowCornerEnds);
 			};
 
-			var removeWindowAreaListeners = function (){
-				windowArea.removeEventListener ('mousemove');
-				windowArea.removeEventListener ('mouseup');
-			};
-
+			
 			var calculatePos = function(ref) {
 				var winX = parseInt(element.prop('offsetLeft'), 10);
 				var winY = parseInt(element.prop('offsetTop'), 10); 	
@@ -135,10 +145,20 @@ angular.module('ngWindowManager',[])
 				element.css ('height', height + 'px');
 			};
 
+			var selectWindow = function (){
+				console.log ('window');
+			};
+			
 			//Set the listeners to the elements
 			titleBarElement.addEventListener ('mousedown', startMoving);
+			titleBarElement.addEventListener ('touchstart', startMoving);
 			resizeButtonElement.addEventListener ('mousedown',startResizing);
-
+			resizeButtonElement.addEventListener ('touchstart',startResizing);
+			
+			
+			titleBarElement.addEventListener ('click', selectWindow);
+			contentButtonElement.addEventListener ('click', selectWindow);
+			
 		}
 	};
 });
