@@ -8,8 +8,12 @@
 
 
 <div class="fullWindowZone">
-  <wmwindow title="hola"> hola </wmwindow>
+  <wmwindow title="hola" options="{{options}}" > hola </wmwindow>
   <wmwindow title="hello"> Que tal </wmwindow>
-  <wmwindow title="{{tarara}}"> Que tal </wmwindow>
+  <wmwindow  title="{{tarara}}"> Que tal </wmwindow>
+
+  <wmwindow ng-repeat="elem in awesomeThings" title=" My title {{elem}}" close="myfunction()" > <p>Win </p><p>{{elem}}</p></wmwindow>
+	
+	
 </div>
 <input type="text" data-ng-model="tarara" >

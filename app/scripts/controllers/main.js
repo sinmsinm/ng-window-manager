@@ -14,4 +14,14 @@ angular.module('wmExampleApp')
       'Two',
       'Three'
     ];
+	  
+	$scope.myfunction = function (){
+		console.log ('Window ');	
+	};
+	
+	$scope.options = {
+		position: {x: 120, y:320},
+		size: {width: 300, height:300}
+	};
+	 
   });

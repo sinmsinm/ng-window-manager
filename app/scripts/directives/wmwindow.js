@@ -9,12 +9,16 @@
 angular.module('ngWindowManager',[])
 .directive('wmwindow', function () {
 	return {
-		template: '<div class="wmWindow active"><div class="wmWindowBox"><div class="wmTitleBar"><div class="wmTitle">{{title}}</div><div class="wmButtonBar"><button class="wmClose"/><button class="wmMaximize"/></div></div><div class="wmContent" data-ng-transclude /><button class="wmResize" />',
+		template: '<div class="wmWindow active"><div class="wmWindowBox"><div class="wmTitleBar"><div class="wmTitle">{{title}}</div><div class="wmButtonBar"><button class="wmMaximize"/><button style="display:none" class="wmRestore"/><button class="wmClose"/></div></div><div class="wmContent" data-ng-transclude /><button class="wmResize" />',
 		restrict: 'E',
 		replace: true,
 		transclude: true,
 		scope: {
-			title: '@'  
+			title: '@',
+			close: '&',
+			maximize: '&',
+			restore: '&',
+			options: '@',
 		},
 
 		link: function (scope, element) {
@@ -23,15 +27,30 @@ angular.module('ngWindowManager',[])
 			var contentButtonElement = element[0].children[0].children[1];
 			var resizeButtonElement = element[0].children[0].children[2];
 			
-
-			var moveState = null;
+			var buttonBar = titleBarElement.children[1];
+		
+			var maximizeButton = buttonBar.children[0];
+			var closeButton = buttonBar.children[2];
+			
+			
+			//State variables
+			var positionState = null;
 			var sizeState = null;
+			var maximizeState = null;
 
+			
+			//Parse the options
+			
+			
+			var options = scope.options ? JSON.parse(scope.options) :{};
+			
+			
+			
 			var startMoving = function (e){
-				var isTouch = (e.targetTouches && e.targetTouches.length == 1);
+				var isTouch = (e.targetTouches && e.targetTouches.length === 1);
 				var moveRef =  isTouch ?  e.targetTouches[0] : e;
 				
-				moveState = calculatePos({
+				positionState = calculatePos({
 					x: moveRef.pageX,
 					y: moveRef.pageY
 				});
@@ -48,7 +67,7 @@ angular.module('ngWindowManager',[])
 
 
 			var startResizing = function (e){
-				var isTouch = (e.targetTouches && e.targetTouches.length == 1);
+				var isTouch = (e.targetTouches && e.targetTouches.length === 1);
 				var moveRef =  isTouch ?  e.targetTouches[0] : e;
 				
 				
@@ -61,7 +80,6 @@ angular.module('ngWindowManager',[])
 
 				windowArea.addEventListener (isTouch ? 'touchmove' : 'mousemove',dragWindowCorner);
 				windowArea.addEventListener (isTouch ? 'touchend' : 'mouseup', dragWindowCornerEnds);
-
 				selectWindow();
 				
 				e.preventDefault();
@@ -69,18 +87,18 @@ angular.module('ngWindowManager',[])
 			};
 
 			var dragWindow = function(e) {  
-				var moveRef = (e.targetTouches && e.targetTouches.length == 1) ?  e.targetTouches[0] : e;
+				var moveRef = (e.targetTouches && e.targetTouches.length === 1) ?  e.targetTouches[0] : e;
 				
-				if (moveState){
+				if (positionState){
 					move(
-						moveRef.pageX - moveState.x,
-						moveRef.pageY - moveState.y
+						moveRef.pageX - positionState.x,
+						moveRef.pageY - positionState.y
 					);
 				}
 			};
 
 			var dragWindowCorner = function (e){
-				var moveRef = (e.targetTouches && e.targetTouches.length == 1) ?  e.targetTouches[0] : e;
+				var moveRef = (e.targetTouches && e.targetTouches.length === 1) ?  e.targetTouches[0] : e;
 
 				if (sizeState){
 					resize (
@@ -91,11 +109,11 @@ angular.module('ngWindowManager',[])
 			};
 
 			var dragWindowEnds = function (e){
-				var isTouch = (e.targetTouches && e.targetTouches.length == 1);
+				var isTouch = (e.targetTouches && e.targetTouches.length === 1);
 				
-				if (moveState) {
+				if (positionState) {
 					element.removeClass('moving');
-					moveState = null;
+					positionState = null;
 				}
 
 				windowArea.removeEventListener (isTouch ? 'touchmove' : 'mousemove',dragWindow);
@@ -104,7 +122,7 @@ angular.module('ngWindowManager',[])
 			};
 
 			var dragWindowCornerEnds = function (e){
-				var isTouch = (e.targetTouches && e.targetTouches.length == 1);
+				var isTouch = (e.targetTouches && e.targetTouches.length === 1);
 				
 				if (sizeState){
 					element.removeClass ('resizing');
@@ -153,13 +171,118 @@ angular.module('ngWindowManager',[])
 				windowArea.appendChild (element[0]);
 			};
 			
-			//Set the listeners to the elements
-			titleBarElement.addEventListener ('mousedown', startMoving);
-			titleBarElement.addEventListener ('touchstart', startMoving);
-			resizeButtonElement.addEventListener ('mousedown',startResizing);
-			resizeButtonElement.addEventListener ('touchstart',startResizing);
 			
-			contentButtonElement.addEventListener ('click', selectWindow);
+			//This function is executed when close button is pushed
+			var close = function (){
+				
+				element.detach();
+				
+				if (scope.close){
+					scope.close();	
+				}
+			};
+			
+			//This functions is executed when maximize is executed
+			var maximize = function (){
+				
+				//Store the position and the size state
+				maximizeState = {
+					x: parseInt(element.prop('offsetLeft'), 10),
+					y: parseInt(element.prop('offsetTop'), 10),
+					width: parseInt(element.prop('offsetWidth'), 10),
+					height: parseInt(element.prop('offsetHeight'), 10)
+				};
+			
+				//Select the element where to maximize
+				var maximizeToElement = options.maximizeTo ? angular.element (options.maximizeTo) : windowArea;
+				
+				var maximizeCoords = {
+					x: parseInt(maximizeToElement.offsetLeft, 10),
+					y: parseInt(maximizeToElement.offsetTop, 10),
+					width: parseInt(maximizeToElement.offsetWidth, 10),
+					height: parseInt(maximizeToElement.offsetHeight, 10)
+				};
+				
+				//Set it to 
+				selectWindow();
+				
+				//move and resize
+				move (maximizeCoords.x + 10,maximizeCoords.y +10 );
+				resize (maximizeCoords.width -20, maximizeCoords.height - 20);
+			
+				//Set the apropiate listeners
+				maximizeButton.removeEventListener ('click',maximize);
+				maximizeButton.addEventListener ('click',restore);
+				titleBarElement.removeEventListener ('dblclick', maximize);
+				titleBarElement.addEventListener ('dblclick', restore);
+				
+				stopWindowListeners();
+			
+				if (scope.maximize){
+					scope.maximize();	
+				}
+				
+			};
+			
+			var restore = function (){
+				//move and resize to previus state
+				move (maximizeState.x,maximizeState.y);
+				resize(maximizeState.width,maximizeState.height);
+					  
+				//Restore the listeners	   
+				maximizeButton.removeEventListener ('click',restore);
+				maximizeButton.addEventListener ('click',maximize);
+				
+				titleBarElement.removeEventListener ('dblclick', restore);
+				titleBarElement.addEventListener ('dblclick', maximize);
+				
+				
+				startWindowListeners();
+				
+				if (scope.restore){
+					scope.restore();	
+				}
+				
+			};
+			
+			
+			var startWindowListeners =  function (){
+				titleBarElement.addEventListener ('mousedown', startMoving);
+				titleBarElement.addEventListener ('touchstart', startMoving);
+				
+				resizeButtonElement.addEventListener ('mousedown',startResizing);
+				resizeButtonElement.addEventListener ('touchstart',startResizing);
+				contentButtonElement.addEventListener ('click', selectWindow);
+				
+			};
+			
+			var stopWindowListeners = function (){
+				titleBarElement.removeEventListener ('mousedown', startMoving);
+				titleBarElement.removeEventListener ('touchstart', startMoving);
+				
+				resizeButtonElement.removeEventListener ('mousedown',startResizing);
+				resizeButtonElement.removeEventListener ('touchstart',startResizing);
+				contentButtonElement.removeEventListener ('click', selectWindow);
+			};
+			
+			startWindowListeners ();
+			closeButton.addEventListener ('click',close);
+			maximizeButton.addEventListener ('click',maximize);
+			titleBarElement.addEventListener ('dblclick', maximize);
+				
+			
+			// apply the options for the window
+			if (options.position){
+				var position = options.position;
+				move (position.x,position.y);	
+			}
+			if (options.size){
+				var size = options.size;
+				resize (size.width,size.height);
+			}
+			
+			
+			
 			
 		}
 	};
