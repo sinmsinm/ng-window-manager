@@ -19,7 +19,7 @@ angular.module('wmExampleApp')
 	$scope.win.newtitle = '';
 	  
 	$scope.myfunction = function (){
-		console.log ('Window ');	
+		console.log ('Window');	
 	};
 	
 	$scope.options = {
@@ -28,9 +28,7 @@ angular.module('wmExampleApp')
 	};
 	 
 	$scope.add = function (){
-		console.log ("add" + $scope.win.newtitle);
-		$scope.awesomeThings.unshift ($scope.win.newtitle);
-		
-	}
+		$scope.awesomeThings.unshift($scope.win.newtitle);
+	};
 	  
   });
