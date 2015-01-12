@@ -6,8 +6,8 @@ body {
 .fullWindowZone{
 	width: 600px;
 	height: 600px;
-	background-color: #AFAFAF;
-	position: absolute;
+	background-color: #EAEAEA;
+	position: relative;
 	top: 0px;
 	left: 0px;
 	

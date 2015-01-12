@@ -6,14 +6,22 @@
 </div>
 
 
+<div>
+	<div class="fullWindowZone">
+	  <wmwindow title="hola" options="{{options}}" > hola </wmwindow>
+	  <wmwindow title="hello"> Que tal </wmwindow>
+	  <wmwindow  title="{{tarara}}"> Que tal </wmwindow>
+	  <wmwindow ng-repeat="elem in awesomeThings" title=" My title {{elem}}" close="myfunction()" > <p>Win </p><p>{{elem}}</p></wmwindow>
 
-<div class="fullWindowZone">
-  <wmwindow title="hola" options="{{options}}" > hola </wmwindow>
-  <wmwindow title="hello"> Que tal </wmwindow>
-  <wmwindow  title="{{tarara}}"> Que tal </wmwindow>
 
-  <wmwindow ng-repeat="elem in awesomeThings" title=" My title {{elem}}" close="myfunction()" > <p>Win </p><p>{{elem}}</p></wmwindow>
-	
-	
+	</div>
 </div>
-<input type="text" data-ng-model="tarara" >
+	
+	
+	
+<div >
+<input type="text" data-ng-model="tarara" > <br />
+
+	Add new: <input type="text" data-ng-model="win.newtitle" > <br /><button data-ng-click="add()">Add</button>
+
+</div>

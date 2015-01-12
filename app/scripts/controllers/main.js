@@ -15,6 +15,9 @@ angular.module('wmExampleApp')
       'Three'
     ];
 	  
+	$scope.win ={};
+	$scope.win.newtitle = '';
+	  
 	$scope.myfunction = function (){
 		console.log ('Window ');	
 	};
@@ -24,4 +27,10 @@ angular.module('wmExampleApp')
 		size: {width: 300, height:300}
 	};
 	 
+	$scope.add = function (){
+		console.log ("add" + $scope.win.newtitle);
+		$scope.awesomeThings.unshift ($scope.win.newtitle);
+		
+	}
+	  
   });
