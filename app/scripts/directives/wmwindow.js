@@ -22,7 +22,9 @@ angular.module('ngWindowManager',[])
 		},
 
 		link: function (scope, element) {
-			var windowArea = element[0].parentElement;
+			var parentWindow = element[0].parentElement;
+			var windowArea = parentWindow;
+			
 			var titleBarElement = element[0].children[0].children[0];
 			var contentButtonElement = element[0].children[0].children[1];
 			var resizeButtonElement = element[0].children[0].children[2];
@@ -32,20 +34,22 @@ angular.module('ngWindowManager',[])
 			var maximizeButton = buttonBar.children[0];
 			var closeButton = buttonBar.children[2];
 			
-			
 			//State variables
 			var positionState = null;
 			var sizeState = null;
 			var maximizeState = null;
 
-			
 			//Parse the options
-			
-			
 			var options = scope.options ? JSON.parse(scope.options) :{};
 			
 			
+			//If it's defined a windowContainer zone we will use it to bind 
+			//all the listeners, that way we can fit windows under an element but move in other 
+			if (options.windowContainer){
+				windowArea = document.getElementById(options.windowContainer);
+			}
 			
+			//Executed when touches or clicks in the title bar 
 			var startMoving = function (e){
 				var isTouch = (e.targetTouches && e.targetTouches.length === 1);
 				var moveRef =  isTouch ?  e.targetTouches[0] : e;
@@ -65,7 +69,7 @@ angular.module('ngWindowManager',[])
 				e.preventDefault();
 			};
 
-
+			//Executed when touches or clicks in the resize button
 			var startResizing = function (e){
 				var isTouch = (e.targetTouches && e.targetTouches.length === 1);
 				var moveRef =  isTouch ?  e.targetTouches[0] : e;
@@ -86,6 +90,7 @@ angular.module('ngWindowManager',[])
 
 			};
 
+			//Execute when user moves the mouse after title is clicked
 			var dragWindow = function(e) {  
 				var moveRef = (e.targetTouches && e.targetTouches.length === 1) ?  e.targetTouches[0] : e;
 				
@@ -97,6 +102,7 @@ angular.module('ngWindowManager',[])
 				}
 			};
 
+			//Execute when user moves the pointer after resize button is clicked
 			var dragWindowCorner = function (e){
 				var moveRef = (e.targetTouches && e.targetTouches.length === 1) ?  e.targetTouches[0] : e;
 
@@ -108,6 +114,7 @@ angular.module('ngWindowManager',[])
 				}
 			};
 
+			//The user ends moving window when mouseup or touchends
 			var dragWindowEnds = function (e){
 				var isTouch = (e.targetTouches && e.targetTouches.length === 1);
 				
@@ -120,7 +127,9 @@ angular.module('ngWindowManager',[])
 				windowArea.removeEventListener (isTouch ? 'touchend' : 'mouseup',dragWindowEnds);
 				titleBarElement.removeEventListener ('click', selectWindow);
 			};
-
+			
+			
+			//The user ends moving the resize button when mouseup or touchends
 			var dragWindowCornerEnds = function (e){
 				var isTouch = (e.targetTouches && e.targetTouches.length === 1);
 				
@@ -134,6 +143,7 @@ angular.module('ngWindowManager',[])
 			};
 
 			
+			//it just makes a postion calculation from the current positon reference passed
 			var calculatePos = function(ref) {
 				var winX = parseInt(element.prop('offsetLeft'), 10);
 				var winY = parseInt(element.prop('offsetTop'), 10); 	
@@ -144,6 +154,7 @@ angular.module('ngWindowManager',[])
 				};
 			};
 
+			//it just makes a size calculation from the current positon reference passed
 			var calculateSize = function (ref){
 				var winWidth = parseInt(element.prop('offsetWidth'), 10);
 				var winHeight = parseInt(element.prop('offsetHeight'), 10);
@@ -167,10 +178,10 @@ angular.module('ngWindowManager',[])
 				element.css ('height', height + 'px');
 			};
 
+			//Move the current window to the highest position
 			var selectWindow = function (){
-				windowArea.appendChild (element[0]);
+				parentWindow.appendChild (element[0]);
 			};
-			
 			
 			//This function is executed when close button is pushed
 			var close = function (){
@@ -215,8 +226,7 @@ angular.module('ngWindowManager',[])
 				//Set it to 
 				selectWindow();
 			
-				//move and resize
-				
+				//move, set the effect and resize 
 				move (maximizeCoords.x + 10,maximizeCoords.y +10 );
 				element.addClass ('maximizing');
 				resize (maximizeCoords.width -20, maximizeCoords.height - 20);
@@ -227,6 +237,7 @@ angular.module('ngWindowManager',[])
 				titleBarElement.removeEventListener ('dblclick', maximize);
 				titleBarElement.addEventListener ('dblclick', restore);
 				
+				//Stop all the window listener (drag,resize...)
 				stopWindowListeners();
 			
 				//Program the effect extraction
@@ -244,6 +255,7 @@ angular.module('ngWindowManager',[])
 				//move and resize to previus state
 				element.addClass ('restoring');
 				
+				//move and resize to prior state
 				move (maximizeState.x,maximizeState.y);
 				resize(maximizeState.width,maximizeState.height);
 					  
@@ -254,13 +266,15 @@ angular.module('ngWindowManager',[])
 				titleBarElement.removeEventListener ('dblclick', restore);
 				titleBarElement.addEventListener ('dblclick', maximize);
 				
-				
+				//start all the window listener (drag,resize...)
 				startWindowListeners();
 				
+				//Execute restore method if it's provided
 				if (scope.restore){
 					scope.restore();	
 				}
 				
+				//Removes the element some time ago
 				setTimeout (function (){
 					element.removeClass ('restoring');
 				},500);
@@ -287,9 +301,12 @@ angular.module('ngWindowManager',[])
 				contentButtonElement.removeEventListener ('click', selectWindow);
 			};
 			
-		
+			//Set the window in creatio
+			
+			//Set and start all the window listener (drag,resize...)
 			startWindowListeners ();
 			
+			//Set buttons listener
 			closeButton.addEventListener ('click',close);
 			maximizeButton.addEventListener ('click',maximize);
 			titleBarElement.addEventListener ('dblclick', maximize);
@@ -314,8 +331,6 @@ angular.module('ngWindowManager',[])
 					element.removeClass ('opening');
 				},400);
 			},50);
-			
-			
 		}
 	};
 });

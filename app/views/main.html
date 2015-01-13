@@ -6,12 +6,12 @@
 </div>
 
 
-<div>
-	<div class="fullWindowZone">
+<div id="myMoveZone" class="fullWindowZone">
+	<div>
 	  <wmwindow title="hola" options="{{options}}" > hola </wmwindow>
 	  <wmwindow title="hello"> Que tal </wmwindow>
 	  <wmwindow  title="{{tarara}}"> Que tal </wmwindow>
-	  <wmwindow ng-repeat="elem in awesomeThings" title=" My title {{elem}}" close="myfunction()" > <p>Win </p><p>{{elem}}</p></wmwindow>
+	  <wmwindow ng-repeat="elem in awesomeThings" options={{options}} title=" My title {{elem}}" close="myfunction()" > <p>Win </p><p>{{elem}}</p></wmwindow>
 
 
 	</div>

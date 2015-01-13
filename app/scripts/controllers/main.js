@@ -24,7 +24,8 @@ angular.module('wmExampleApp')
 	
 	$scope.options = {
 		position: {x: 120, y:320},
-		size: {width: 300, height:300}
+		size: {width: 300, height:300},
+		windowContainer: 'myMoveZone'
 	};
 	 
 	$scope.add = function (){
