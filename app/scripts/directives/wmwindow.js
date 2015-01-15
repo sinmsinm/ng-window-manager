@@ -49,6 +49,28 @@ angular.module('ngWindowManager',[])
 				windowArea = document.getElementById(options.windowContainer);
 			}
 			
+			
+			scope.$on(
+             	"$destroy",
+					function handleDestroyEvent() {
+						setTimeout (function (){
+						element.addClass ('closing');
+				
+							setTimeout (function (){
+							element.removeClass ('closing');
+							element.detach();
+						},400);
+					},50);
+            
+					if (scope.close){
+						scope.close();
+					}
+				}
+			);
+
+		
+			
+			
 			//Executed when touches or clicks in the title bar 
 			var startMoving = function (e){
 				var isTouch = (e.targetTouches && e.targetTouches.length === 1);
@@ -185,21 +207,7 @@ angular.module('ngWindowManager',[])
 			
 			//This function is executed when close button is pushed
 			var close = function (){
-				
-				setTimeout (function (){
-					element.addClass ('closing');
-				
-					setTimeout (function (){
-						element.removeClass ('closing');
-						element.detach();
-
-					},400);
-				},50);
-				
-				
-				if (scope.close){
-					scope.close();	
-				}
+				scope.$destroy();
 			};
 			
 			//This functions is executed when maximize is executed
