@@ -17,6 +17,7 @@ angular.module('wmExampleApp')
 	  
 	$scope.win ={};
 	$scope.win.newtitle = '';
+	$scope.maximizabe = false;
 	  
 	$scope.myfunction = function (){
 		console.log ('Window');	
@@ -32,4 +33,9 @@ angular.module('wmExampleApp')
 		$scope.awesomeThings.unshift($scope.win.newtitle);
 	};
 	  
+	$scope.change = function (){
+		$scope.maximizable = $scope.maximizable ?  false : true  ;
+	};
+	  
+		  
   });

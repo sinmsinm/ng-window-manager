@@ -9,7 +9,7 @@
 angular.module('ngWindowManager',[])
 .directive('wmwindow', function () {
 	return {
-		template: '<div class="wmWindow"><div class="wmWindowBox"><div class="wmTitleBar"><div class="wmTitle">{{title}}</div><div class="wmButtonBar"><button class="wmMaximize"/><button style="display:none" class="wmRestore"/><button class="wmClose"/></div></div><div class="wmContent" data-ng-transclude /><button class="wmResize" />',
+		template: '<div class="wmWindow"><div class="wmWindowBox"><div class="wmTitleBar"><div class="wmTitle">{{title}}</div><div class="wmButtonBar"><button class="wmMaximize" ng-show="maximizable" /><button style="display:none" class="wmRestore"/><button class="wmClose" ng-show="closeable"/></div></div><div class="wmContent" data-ng-transclude /><button  class="wmResize" />',
 		restrict: 'E',
 		replace: true,
 		transclude: true,
@@ -19,6 +19,8 @@ angular.module('ngWindowManager',[])
 			maximize: '&',
 			restore: '&',
 			options: '@',
+			maximizable: '@',
+			closeable: '@'
 		},
 
 		link: function (scope, element) {
@@ -42,24 +44,24 @@ angular.module('ngWindowManager',[])
 			//Parse the options
 			var options = scope.options ? JSON.parse(scope.options) :{};
 			
+			if (scope.maximizable===undefined) {scope.maximizable = true;}
+			if (scope.closeable===undefined) {scope.closeable = true;}
 			
 			//If it's defined a windowContainer zone we will use it to bind 
 			//all the listeners, that way we can fit windows under an element but move in other 
 			if (options.windowContainer){
 				windowArea = document.getElementById(options.windowContainer);
 			}
-			
-			
-			scope.$on(
-             	"$destroy",
-					function handleDestroyEvent() {
+		
+			//Set the destroy method. 
+			scope.$on('$destroy',function handleDestroyEvent() {
 						setTimeout (function (){
 						element.addClass ('closing');
 				
 							setTimeout (function (){
 							element.removeClass ('closing');
 							element.detach();
-						},400);
+						},300);
 					},50);
             
 					if (scope.close){
@@ -68,8 +70,6 @@ angular.module('ngWindowManager',[])
 				}
 			);
 
-		
-			
 			
 			//Executed when touches or clicks in the title bar 
 			var startMoving = function (e){
@@ -317,7 +317,7 @@ angular.module('ngWindowManager',[])
 			//Set buttons listener
 			closeButton.addEventListener ('click',close);
 			maximizeButton.addEventListener ('click',maximize);
-			titleBarElement.addEventListener ('dblclick', maximize);
+			if (scope.maximizable) {titleBarElement.addEventListener ('dblclick', maximize);}
 			
 			// apply the options for the window
 			if (options.position){
