@@ -1,7 +1,9 @@
 # ng-window-manager
 Angular JS plugin to handle content inside windows, allowing user to move them close, minimize, ...
 
-# How to try it
+That directive is inspired in the work of Ramón Lamana on Ventus https://github.com/rlamana/Ventus
+
+## How to try it
 
 * npm install
 * bower install
@@ -49,7 +51,7 @@ $scope.options = {
 ```
 
 
-# Do you need a bower component?
+## Do you need a bower component?
 
 If you want to install the component in your project you can add it using the command:
 ```
