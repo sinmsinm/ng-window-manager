@@ -26,16 +26,21 @@ angular.module('wmExampleApp')
 	$scope.options = {
 		position: {x: 120, y:320},
 		size: {width: 300, height:300},
-		windowContainer: 'myMoveZone'
+		windowContainer: 'myMoveZone',
+		maximizeTo: 'myMoveZone',
+
 	};
 	 
 	$scope.add = function (){
 		$scope.awesomeThings.unshift($scope.win.newtitle);
 	};
-	  
-	$scope.change = function (){
-		$scope.maximizable = $scope.maximizable ?  false : true  ;
-	};
-	  
-		  
+	 
+	$scope.isMaximizable = function (){
+		return $scope.maximizabe;	
+	}
+	 
+	$scope.isCloseable = function (){
+		return false;	
+	}
+	
   });

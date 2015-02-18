@@ -348,6 +348,7 @@
     min-height: 60px;
     overflow-x: hidden;
     overflow-y: hidden;
+    position: relative;
 }
 .wmWindow .wmWindowBox button.wmResize {
     position: absolute;
@@ -392,6 +393,15 @@
 }
 .wmWindow.active{
 	display: block;
+}
+
+.wmWindow.active iframe{
+    top: 0px !important;
+}
+
+.wmWindow.maximized{
+	position: fixed;
+	z-index: 1000000 !important;
 }
 
 .wmWindow.active .wmContent * {

@@ -9,7 +9,7 @@
 <div id="myMoveZone" class="fullWindowZone">
 	<div>
 	  <wmwindow title="hola" options="{{options}}"> hola </wmwindow>
-	  <wmwindow title="hello" maximizable="{{maximizable}}" closeable="{{maximizable}}"> Que tal </wmwindow>
+	  <wmwindow title="hello" maximizable="{{isMaximizable}}" closeable="{{isCloseable}}"> Que tal </wmwindow>
 	  <wmwindow  title="{{tarara}}"> Que tal </wmwindow>
 	  <wmwindow ng-repeat="elem in awesomeThings" options={{options}} title=" My title {{elem}}" close="myfunction()" > <p>Window </p><p>{{elem}}</p>	</wmwindow>
 
@@ -24,5 +24,4 @@
 
 	Add new: <input type="text" data-ng-model="win.newtitle" > <br /><button data-ng-click="add()">Add</button>
 	<button data-ng-click="awesomeThings.pop()"> Remove element</button>
-	<button data-ng-click="change()">change</button>
 </div>
